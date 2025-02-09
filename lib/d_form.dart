@@ -7,16 +7,17 @@ import 'package:flutter/material.dart';
 
 class DForm extends StatefulWidget {
   final List<dynamic> formMap;
-  final GlobalKey<FormState>? formKey;
 
-  const DForm({super.key, required this.formMap, required this.formKey});
+  DForm({required Key key, state, required this.formMap}) : super(key: key);
 
   @override
-  createState() => _DFormState();
+  createState() => DFormState();
 }
 
-class _DFormState extends State<DForm> {
-  List<FieldModel> fields = [];
+class DFormState extends State<DForm> {
+  final GlobalKey<FormState>? formKey = GlobalKey<FormState>();
+  final List<FieldModel> fields = [];
+  final List<TextEditingController> controllers = [];
 
   @override
   void initState() {
@@ -24,6 +25,7 @@ class _DFormState extends State<DForm> {
     for (var element in widget.formMap) {
       if (element['type'] == "text") {
         var model = TextFieldModel.fromJson(element);
+        controllers.add(TextEditingController(text: model.value));
         fields.add(model);
       }
     }
@@ -33,12 +35,20 @@ class _DFormState extends State<DForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
-        key: widget.formKey,
+        key: formKey,
         child: Column(
           children: [
-            for (var field in fields)
-              if (field is TextFieldModel) CustomTextField(model: field),
+            for (var i=0; i<fields.length; i++)
+              if (fields[i] is TextFieldModel) CustomTextField(model: fields[i] as TextFieldModel, controller: controllers[i]),
           ],
         ));
+  }
+
+  Map<String, dynamic> getValues() {
+    Map<String, dynamic> values = {};
+    for (var i=0; i<fields.length; i++) {
+      values[fields[i].id] = controllers[i].text;
+    }
+    return values;
   }
 }

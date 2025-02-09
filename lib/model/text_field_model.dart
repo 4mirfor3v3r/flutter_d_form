@@ -13,8 +13,8 @@ class TextFieldModel extends FieldModel {
         super.validations.add(ValidationModel.fromJson(json["validation"][index]));
       });
     }
-    borderType = json['borderType'];
-    keyboardType = json['keyboardType'];
+    borderType = json['border_type'];
+    keyboardType = json['keyboard_type'];
   }
 }
 

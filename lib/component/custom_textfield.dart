@@ -2,32 +2,51 @@ import 'package:d_form/model/text_field_model.dart';
 import 'package:d_form/utils/dimensions.dart';
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextFieldModel model;
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController? controller;
 
-  CustomTextField({super.key, required this.model});
+  CustomTextField({super.key, required this.model, required this.controller});
+
+  @override
+  createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  bool obscureText = false;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.only(bottom: 20),
+        margin: const EdgeInsets.only(bottom: 8),
         child: TextFormField(
-          controller: controller,
+          controller: widget.controller,
           decoration: InputDecoration(
-            labelText: model.label,
-            hintText: model.hint,
-            border: BorderType.values[model.borderType ?? 0] == BorderType.outlineInputBorder
+            errorMaxLines: 3,
+            labelText: widget.model.label,
+            hintText: widget.model.hint,
+            suffixIcon: widget.model.keyboardType == TextInputType.visiblePassword.index
+                ? IconButton(
+                    icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        obscureText = !obscureText;
+                      });
+                    },
+                  )
+                : null,
+            border: BorderType.values[widget.model.borderType ?? 0] == BorderType.outlineInputBorder
                 ? OutlineInputBorder(
                     borderRadius: BorderRadius.circular(Dimen.radius),
                     borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1))
                 : UnderlineInputBorder(
                     borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1)),
           ),
-          keyboardType: TextInputType.values[model.keyboardType ?? 0],
+          keyboardType: TextInputType.values[widget.model.keyboardType ?? 0],
+          obscureText: obscureText,
           validator: (value) {
-            if (model.validations.isNotEmpty) {
-              for (var validation in model.validations) {
+            if (widget.model.validations.isNotEmpty) {
+              for (var validation in widget.model.validations) {
                 switch (validation.type) {
                   case "required":
                     if (value == null || value.isEmpty) {
