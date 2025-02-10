@@ -1,6 +1,8 @@
 library d_form;
 
+import 'package:d_form/component/custom_dropdown.dart';
 import 'package:d_form/component/custom_textfield.dart';
+import 'package:d_form/model/dropdown_model.dart';
 import 'package:d_form/model/field_model.dart';
 import 'package:d_form/model/text_field_model.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,10 @@ class DFormState extends State<DForm> {
         var model = TextFieldModel.fromJson(element);
         controllers.add(TextEditingController(text: model.value));
         fields.add(model);
+      }else if(element['type'] == "dropdown") {
+        var model = DropdownModel.fromJson(element);
+        controllers.add(TextEditingController(text: model.value));
+        fields.add(model);
       }
     }
     setState(() {});
@@ -34,14 +40,17 @@ class DFormState extends State<DForm> {
 
   @override
   Widget build(BuildContext context) {
+    var children = <Widget>[];
+    for (var i=0; i<fields.length; i++) {
+      if (fields[i] is TextFieldModel) {
+        children.add(CustomTextField(model: fields[i] as TextFieldModel, controller: controllers[i]));
+      } else if (fields[i] is DropdownModel) {
+        children.add(CustomDropdown(model: fields[i] as DropdownModel, controller: controllers[i]));
+      }
+    }
     return Form(
         key: formKey,
-        child: Column(
-          children: [
-            for (var i=0; i<fields.length; i++)
-              if (fields[i] is TextFieldModel) CustomTextField(model: fields[i] as TextFieldModel, controller: controllers[i]),
-          ],
-        ));
+        child: Column(children: children,));
   }
 
   Map<String, dynamic> getValues() {
