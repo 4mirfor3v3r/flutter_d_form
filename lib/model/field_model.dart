@@ -5,7 +5,7 @@ class FieldModel{
   late String type;
   String? label;
   String? hint;
-  String? value;
+  List<dynamic>? value;
   List<ValidationModel> validations = [];
   FieldModel({required this.id, required this.type, this.label, this.hint, this.value, required this.validations});
 
